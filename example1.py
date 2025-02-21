@@ -3,8 +3,8 @@ from ipa_phoneme_mapper import IPAPhonemeMapper
 
 raw_phoneme = "ɑ"
 
-model_name = "65_phoneme"
-mapper = IPAPhonemeMapper(model=model_name)
+dictionary_name = "phoneme_65_empirical"
+mapper = IPAPhonemeMapper(dictionary=dictionary_name)
 
 standardized = mapper.standardize_phoneme(raw_phoneme)
 print(f"Raw phoneme: {raw_phoneme} -> Standardized: {standardized}")

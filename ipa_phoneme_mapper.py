@@ -1,60 +1,65 @@
 from typing import Union, Dict, List
-import models.phoneme_model_65 as model_65
+import importlib
+#import dictionaries.phoneme_65_empirical as phoneme_65_empirical
 
 class IPAPhonemeMapper:
     """
-    A class for standardizing IPA phonemes using predefined mapping models.
+    A class for standardizing IPA phonemes using predefined mapping dictionaries.
     
     Attributes:
-        current_model (str): Name of the currently loaded mapping model
+        current_dictionary (str): Name of the currently loaded mapping dictionary
         phoneme_mapping (Dict): Dictionary containing the phoneme mapping rules
         phoneme_indices (Dict): Dictionary containing the indices for standardized phonemes
     """
     
-    def __init__(self, model: str = "65_phoneme"):
+    def __init__(self, dictionary: str = "phoneme_65_empirical"):
         """
-        Initialize the IPAPhonemeMapper with a specified model.
+        Initialize the IPAPhonemeMapper with a specified dictionary.
         
         Args:
-            model (str): Name of the mapping model to use (default: "65_phoneme")
+            dictionary (str): Name of the mapping dictionary to use (default: "phoneme_65_empirical")
         """
-        self.current_model = None
+        self.current_dictionary = None
         self.phoneme_mapping = {}
         self.phoneme_indices = {}
-        self.set_mapping_model(model)
+        self.set_mapping_dictionary(dictionary)
     
-    def set_mapping_model(self, model: str) -> None:
+    def set_mapping_dictionary(self, dictionary: str) -> None:
         """
-        Set the phoneme mapping model to use.
+        Set the phoneme mapping dictionary to use.
         
         Args:
-            model (str): Name of the mapping model to use
+            dictionary (str): Name of the mapping dictionary to use
         
         Raises:
-            ValueError: If the specified model is not supported or if mappings are invalid
+            ValueError: If the specified dictionary is not supported or if mappings are invalid
         """
-        if model == "65_phoneme":
-            self.phoneme_mapping = model_65.phoneme_mapping
-            self.phoneme_indices = model_65.phoneme_mapped_index
+        dict_module_name = f"dictionaries.{dictionary}"
+        try:
             
-            # Validate that all mapped values have corresponding indices
-            invalid_values = []
-            for value in set(self.phoneme_mapping.values()):
-                if value not in self.phoneme_indices:
-                    invalid_values.append(value)
-            
-            if invalid_values:
-                raise ValueError(
-                    f"Found mapped values without corresponding indices: {invalid_values}"
-                )
-        else:
-            raise ValueError(f"Unsupported model: {model}")
+            phoneme_65_empirical = importlib.import_module(dict_module_name, package=None)
+        except ImportError:
+            raise ValueError("Failed to import dictionary: "+ dict_module_name, + "Please check the dictionary name and make sure it exists in the ./dictionaries directory.")
+    
+        self.phoneme_mapping = phoneme_65_empirical.phoneme_mapping
+        self.phoneme_indices = phoneme_65_empirical.phoneme_mapped_index
         
-        self.current_model = model
+        # Validate that all mapped values have corresponding indices
+        invalid_values = []
+        for value in set(self.phoneme_mapping.values()):
+            if value not in self.phoneme_indices:
+                invalid_values.append(value)
+        
+        if invalid_values:
+            raise ValueError(
+                f"Found mapped values without corresponding indices: {invalid_values}"
+            )
+    
+        self.current_dictionary = dictionary
     
     def standardize_phoneme(self, raw_phoneme: str, return_index: bool = False) -> Union[str, int]:
         """
-        Standardize a single raw IPA phoneme according to the current mapping model.
+        Standardize a single raw IPA phoneme according to the current mapping dictionary.
         
         Args:
             raw_phoneme (str): The raw IPA phoneme to standardize

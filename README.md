@@ -6,6 +6,9 @@ Under construction.
 
 A Python library that bridges the gap between linguistic phoneme representations and machine learning systems by providing standardized mappings of International Phonetic Alphabet (IPA) symbols.
 
+What does it do: 
+Given a phoneme or a sequence of phonemes: h ɛ l oʊ  (_hello_), it will generate standardized base phonemes or tokens: `[50, 7, 56, 26]` that are more suitable for machine learning.
+
 ## Motivation
 
 The International Phonetic Alphabet (IPA) is a comprehensive system for representing speech sounds, based on their articulatory properties - how they are physically produced by the human vocal tract. While this system is excellent for linguistic analysis, it presents challenges for automatic speech recognition (ASR) and other machine learning applications:
@@ -31,7 +34,7 @@ This makes it easier to:
 
 ## Features
 
-- Standardize raw IPA phonemes to a consistent set using predefined mapping models
+- Standardize raw IPA phonemes to a consistent set using predefined mapping dictionaries
 - Convert phonemes to numeric indices for machine learning tasks
 - Handle unknown phonemes gracefully with configurable fallback options
 - Process both individual phonemes and space-delimited phoneme strings
@@ -48,15 +51,15 @@ cd IPAPhonemeMapper
 2. Copy the required files to your project:
 
 - ipa_phoneme_mapper.py
-- models/phoneme_model_65.py
+- dictionaries/phoneme_65_empirical.py
 
 3. Use in your code:
 
 ```python
 from ipa_phoneme_mapper import IPAPhonemeMapper
 
-# Initialize the mapper with the 65-phoneme model
-mapper = IPAPhonemeMapper(model="65_phoneme")
+# Initialize the mapper with the 65-phoneme dictionary
+mapper = IPAPhonemeMapper(dictionary="phoneme_65_empirical")
 
 # Standardize a single phoneme
 raw_phoneme = "ɑ"
@@ -88,15 +91,15 @@ Numeric tokens: [50, 7, 56, 26]
 ```
 
 
-## Models
+## Dictionaries
 
-### 65-Phoneme Model (`phoneme_model_65`)
+### 65-Phoneme (`phoneme_65_empirical`)
 
-The default model maps over 600 IPA phonemes to a standardized set of 67 phonemes (65 base phonemes + 2 special tokens).
+The default dictionary maps over 600 IPA phonemes to a standardized set of 67 phonemes (65 base phonemes + 2 special tokens). This mapping is mostly empirically driven and somewhat systematic. In other words, there is no linguistic rule being followed, it is based on what is more frequent and causes less confusion. For example, not all consonants have palatalized variants (tʲ, nʲ, rʲ, ɭʲ) because not all are as common.
 
-#### Model Structure
+#### Structure
 
-The model consists of:
+The dictionary consists of:
 - 67 total tokens (indexed 0-66)
 - 65 base phonemes
 - 2 special tokens: 'SIL' (silence) and 'noise'
@@ -124,6 +127,8 @@ The model consists of:
    - SIL (silence): Index 0
    - noise: Index 66
 
+The 'noise' token implies "to be ignored" due to either ambiguity or due to lack of proper knowledge about the rare phonemes. However, with this mapping system it's rare in non-tonal languages.
+
 #### Key Features
 
 - **Consistent Length Handling**: Common long vowels are preserved as distinct phonemes (e.g., i vs i:)
@@ -136,7 +141,7 @@ The model consists of:
 
 #### Common Mappings
 
-The model applies systematic mappings for:
+The dictionary applies somewhat systematic mappings for:
 - Aspirated consonants → unaspirated counterparts
 - Geminate (doubled) consonants → single consonants
 - Nasalized vowels → oral counterparts
@@ -144,50 +149,70 @@ The model applies systematic mappings for:
 - Complex consonant sequences → simpler forms
 - Breathy and creaky voiced sounds → modal voice
 
-This model is particularly useful for:
+This dictionary is particularly useful for:
 - Speech recognition tasks
 - Cross-linguistic phoneme analysis
 - Standardizing phonetic transcriptions
 - Reducing phonetic complexity for machine learning
 
 
-## Validation
-The library includes built-in validation tools. You can run them using the provided test script:
+## Validation - Contribute new dictionaries
+
+
+If you want to start from the basics then edit the mappings in [`dictionaries/draft_new_mapping.py`](dictionaries/draft_new_mapping.py), then validate to see what's left to map. The library includes built-in validation tools. You can run them using the provided test script:
+
+```python
+    
+validate_phoneme_mapper(dictionary_name = "draft_new_mapping")
+
+check_missing_phonemes(dictionary_name = "draft_new_mapping")
+
+''' prints:
+Validating mappings against indices...
+Total unique mapped values: 50
+Total unique tokens: 50
+Total mappings: 73
+All mapped values exits in the standard index (have token numbers).
+All tests passed!
+----------------------------------------
+---------- Check missing phonemes ----------
+bad phoneme: d͡ʒ standardized: -  ('-' implies no mapping, 'noise' implies deliberate ignorance)
+bad phoneme: ʃʲ standardized: -
+bad phoneme: ɜ standardized: -
+bad phoneme: ɘ standardized: -
+bad phoneme: t͡ʃʰ standardized: -
+bad phoneme: ä standardized: -
+bad phoneme: t͡ʃ standardized: -
+bad phoneme: ə̆ standardized: -
+bad phoneme: pʰ standardized: -
+'''
+```
+
+Or you can customize the extensive default phoneme dictionary, which already covers most common use cases but remains open to refinement [`dictionaries/phoneme_65_empirical.py`](dictionaries/phoneme_65_empirical.py).
 
 ```python
 from test_phoneme_mapper import validate_phoneme_mapper, check_missing_phonemes
 
 # Validate the mapper configuration
-validate_phoneme_mapper()
+validate_phoneme_mapper(dictionary_name = "phoneme_65_empirical")
 
-# Check for missing phonemes in the current model
-check_missing_phonemes()
+# Check for missing phonemes in the current dictionary
+check_missing_phonemes(dictionary_name = "phoneme_65_empirical")
 
 ''' prints:
-
-IPAPhonemeMapper initialized with model: 65_phoneme
-
 Validating mappings against indices...
-Total unique mapped values: 65
+Total unique mapped values: 67
 Total unique tokens: 67
-Total mappings: 594
-Unique keys in mapping: 594
-All mapped values have corresponding indices!
+Total mappings: 619
+All mapped values exits in the standard index (have token numbers).
+All tests passed!
 ----------------------------------------
 ---------- Check missing phonemes ----------
 bad phoneme: ʔ standardized: noise
-bad phoneme: c standardized: -
-bad phoneme: ɭ standardized: -
 bad phoneme: ʔ standardized: noise
-bad phoneme: c standardized: -
-bad phoneme: q standardized: -
-bad phoneme: l̩ standardized: -
-bad phoneme: ɨː standardized: -
-bad phoneme: ɭ standardized: -
 bad phoneme: ʔʷ standardized: noise
-missing_phonemes: ['ʔ', 'c', 'ɭ', 'ʔ', 'c', 'q', 'l̩', 'ɨː', 'ɭ', 'ʔʷ']
+missing_phonemes: ['ʔ', 'ʔ', 'ʔʷ']
 ----------------------------------------
-
 '''
 ```
 
@@ -196,7 +221,7 @@ missing_phonemes: ['ʔ', 'c', 'ɭ', 'ʔ', 'c', 'q', 'l̩', 'ɨː', 'ɭ', 'ʔʷ']
 ## IPAPhonemeMapper
 
 ```python
-mapper = IPAPhonemeMapper(model="65_phoneme")
+mapper = IPAPhonemeMapper(dictionary="phoneme_65_empirical")
 ```
 
 ## Methods
@@ -221,7 +246,7 @@ mapper = IPAPhonemeMapper(model="65_phoneme")
     - Returns all current phoneme indices
 
 # Contributing
-I am looking for contributions! Please feel free to submit a Pull Request. See instructions in [CONTRIBUTING.md](CONTRIBUTING.md)
+Seeking contributions particularly from linguists and phonology experts. Whether it's expanding phoneme coverage, improving phonetic mappings, or enhancing language support, your expertise is valuable. Please feel free to submit a Pull Request. See instructions in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 
 # License

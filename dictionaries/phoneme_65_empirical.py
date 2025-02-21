@@ -126,6 +126,7 @@ phoneme_mapping = {
     'ɚ': 'ɚ',
     'o': 'o',
     'ɨ': 'ɨ',
+    'ɨ': 'ɨ',
     
     # Common diphthongs - keep distinct ones
     'eɪ': 'eɪ', 'aɪ': 'aɪ', 'ɔɪ': 'ɔɪ',
