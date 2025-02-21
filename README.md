@@ -52,6 +52,7 @@ cd IPAPhonemeMapper
 
 - ipa_phoneme_mapper.py
 - dictionaries/phoneme_65_empirical.py
+- test_phoneme_mapper.py
 
 3. Use in your code:
 
@@ -159,10 +160,11 @@ This dictionary is particularly useful for:
 ## Validation - Contribute new dictionaries
 
 
-If you want to start from the basics then edit the mappings in [`dictionaries/draft_new_mapping.py`](dictionaries/draft_new_mapping.py), then validate to see what's left to map. The library includes built-in validation tools. You can run them using the provided test script:
+If you want to start from the basics then edit the mappings in [`dictionaries/draft_new_mapping.py`](dictionaries/draft_new_mapping.py), then validate to see what's left to map. The library includes built-in [`validation tools`](test_phoneme_mapper.py). You can run them using the provided test script:
 
 ```python
-    
+from test_phoneme_mapper import validate_phoneme_mapper, check_missing_phonemes
+
 validate_phoneme_mapper(dictionary_name = "draft_new_mapping")
 
 check_missing_phonemes(dictionary_name = "draft_new_mapping")
