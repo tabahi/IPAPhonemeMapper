@@ -7,7 +7,9 @@ Under construction.
 A Python library that bridges the gap between linguistic phoneme representations and machine learning systems by providing standardized mappings of International Phonetic Alphabet (IPA) symbols.
 
 What does it do: 
-Given a phoneme or a sequence of phonemes: h ɛ l oʊ  (_hello_), it will generate standardized base phonemes or tokens: `[50, 7, 56, 26]` that are more suitable for machine learning.
+Converts phoneme sequences (e.g., h ɛ l oʊ for hello) into standardized numerical tokens [50, 7, 56, 26] optimized for machine learning applications.
+
+The base phoneme system is purposefully designed to be augmented with nuance annotations at a later stage. Instead of developing a complex system that must recognize hundreds of phonemes and their variants from the outset, this approach begins with a simpler phoneme recognition system that can be enhanced with nuance detection capabilities as needed.
 
 ## Motivation
 
@@ -30,6 +32,10 @@ This makes it easier to:
 - Standardize phonetic transcriptions across different sources
 - Convert between different phonemic representation systems
 - Create consistent input features for speech recognition models
+
+
+Our project aims to develop a two-tier phoneme recognition system that prioritizes accuracy and scalability. The primary objective is to create a robust base system capable of recognizing fundamental phonemes, which will serve as the foundation for more sophisticated sound analysis. This base system will then be augmented with a complementary mechanism designed to detect and classify phonetic nuances and allophonic variations.
+
 
 
 ## Features
